@@ -4,6 +4,8 @@ Code for runing analyses for projects 4 and 5 of the practical of the division o
 
 By now, you have collected the necessary data to start processing it. This means, that you have all the photographs and a subset of them have been annotated. If you are missing any of these steps, please finish those before following this. Here, you will learn how to execute the code from ML-morph to digitize landmarks automatically and some starting code to process the annotated data.
 
+>*Before starting, please read the ML-morph [paper](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13373) and the [GitHub repository](https://github.com/agporto/ml-morph). I tried to make this comprehensible as posible but it doesn't include all the details mentioned there.*
+
 ## Using ML-morph to digitize landmarks automatically
 
 For this part of the process you will need the following material:
@@ -12,6 +14,7 @@ For this part of the process you will need the following material:
    - TPS file (includes the landkmarks associated to the photographs)
 2. Bash scripts in the working directory of your project
 >```bash
+>ML-Morph_pre-processing.sh
 >ML-Morph_Train_Predictors.sh
 >ML-Morph_compare_predictors.sh
 >ML-Morph_test_prediction.sh 
@@ -93,7 +96,7 @@ Go back to the "main directory" and from there you can run the first script. To 
 ```bash
 $ cd ..
 ```
-#### Create test and train folders from already annotated data
+#### a. Create test and train folders from already annotated data
 The first step is called the *pre-processing* step where the a *test* and *train* folder are made from a user-designed image folder. To do this, you need to run the script *ML-Morph_pre-processing.sh*. 
 Before jumping into running this script, let's see first what is contained here! 
 ##### <ins> Structure of a bash script </ins>
@@ -120,14 +123,15 @@ module load Python
 
 #PART 1
 
-#We need to generate train and test folders  but KEEP .TPS FILES APART, AND LABEL THE EXTENSION AS ALL CAPS
+#We need to generate train and test folders 
 echo "Starting part one: dividing and checking images"
 python3 ${ml_morph_folder}/preprocessing.py -i ${working_folder}/annotated/photographs -t ${working_folder}/annotated/training_with_150_images.tps
 
 ML-Morph_pre-processing.sh (END)
 ```
+We will over what each line does a bit later, but now we will talk about details on bash scripts.
 Here you see that the first line of code is ```#!/bin/bash```, which specifies that this file should be read as a bash script.
-The lines starting with ```#SBATCH are directives for the workload manager. These have the general syntax
+The lines starting with ```#SBATCH``` are directives for the workload manager. These have the general syntax
 ```bash
 #SBATCH option_name=argument
 ```
@@ -135,10 +139,40 @@ For example, the first directive is
 ```bash
 #SBATCH --job-name=exampleJob
 ```
-which sets the name of the job and allows the user to identify the job
-Run the script *ML-Morph_Train_predictors.sh*
+which sets the name of the job and allows the user to identify the job. After the directives, you will find the code that will be run in the terminal. For this example, first we are changing directory to the main directory where you will be working.
 ```bash
-$ sbatch ML-Morph_Train_predictors.sh
+cd /storage/homefs/jr22y334/Practical2025/Lake_Constance_tributaries/
+```
+After this, we are creating variables for the main directory and the simple-ml-morph path. This is not *needed* but it is a really convinient way of not needing to write these paths over and over again.
+```bash
+ml_morph_folder=/storage/homefs/jr22y334/Practical2025/Lake_Constance_tributaries/ml-morph/simple-ml-morph/
+working_folder=/storage/homefs/jr22y334/Practical2025/Lake_Constance_tributaries/
+```
+For this and the other scripts you will run, you need to activate a Python virtual environment and load the modules CUDA and Python. This will allow you to run Python scripts through the terminal. 
+```bash
+source venv-ml/bin/activate
+module load CUDA
+module load Python
+```
+Now, you are into the line of code where you are dividing the annotated data into train (80%) and test (20%) which will be used for the shape predictor models. To run the ml-morph python scripts ```.py``` use the command ```python3```. Here you use the argument ```-i``` to define the directory that contains the annotated images, and ```-t``` to define the TPS file associated to the annotates images.
+```bash
+python3 ${ml_morph_folder}/preprocessing.py -i ${working_folder}/annotated/photographs -t ${working_folder}/annotated/training_with_150_images.tps
+```
+Other arguments that can be included to this scripts can be found using the option ```-h```
+```bash
+$ python3 preprocessing.py -h
+usage: preprocessing.py [-h] [-i] [-c] [-t]
+
+options:
+  -h, --help         show this help message and exit
+  -i , --input-dir   input directory containing image files (default = images)
+  -c , --csv-file    (optional) XY coordinate file in csv format
+  -t , --tps-file    (optional) tps coordinate file
+```
+The script ```preprocessing.py``` creates a test and train directories with an associated ```.xml```. Besides this, you will found the warning and error messages and the output of the script in the files ```Pre-processing_test.err``` and ```Pre-processing_test.out``` respectively.\
+To run this script, you need to submit a job in the cluster with the command ```sbatch```
+```bash
+$ sbatch ML-Morph_pre-processing.sh
 sbatch: Partition set to "epyc2,bdw"
 sbatch: QoS set to job_cpu
 Submitted batch job 18590972
@@ -153,7 +187,7 @@ JobID           JobName  Partition    Account  AllocCPUS      State ExitCode
 18591358.ex+     extern                gratis          3    RUNNING      0:0 
 ```
 Here you can see that your job is running. Another possible outputs are pending, completed or cancelled.
-If you see that your job is completed in an unexpected amount of time check the error file, which should be called "Predict_test.err". For example, in this case the path to the script *shape_trainer-py* was not found. This means you have to adjust your script, to avoid this error tne next time you run the script.
+If you see that your job is completed in an unexpected amount of time check the error file, which should be a ".err" file. For example, in this case the path to the script *shape_trainer-py* was not found. This means you have to adjust your script, to avoid this error the next time you run the script.
 ```bash
 $ less Predict_test.err
 python3: can't open file '/storage/homefs/jr22y334/Practical2025/Lake_Constance_tributaries//preprocessing.py': [Errno 2] No such file or directory
@@ -165,5 +199,43 @@ python3: can't open file '/storage/homefs/jr22y334/Practical2025/Lake_Constance_
 sbatch: Partition set to "epyc2,bdw"
 sbatch: QoS set to job_cpu
 ```
+If everything worked well, you can check the directories ```test``` and ```train``` to see which images are in which directory. 
 
+#### b. Training and testing shape predictors
+Having now train and test data, you can train and test the shape predictors models using the script *ML-Morph_Train_predictors.sh*. Submit your job like and this should run for ca. 10 minutes.
+```bash
+$ sbatch ML-Morph_Train_predictors.sh
+```
+In the meantime, let's check what is done in this script. The first part consist on running different shape predictors with different parameters. Here you are varying the parameters three depth ```-dp``` and cascade depth ```-c```. For the function of these and other parameters please refer to the [ML-morph paper](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13373)
+```bash
+#PART 1
+echo "Starting part one: testing and training shape prediction"
+#Time to train and test the shape predictors with different parameters
+python3 ${ml_morph_folder}/shape_trainer.py -d train.xml -t test.xml -th 12 -dp 1 -c 20  -nu 0.1 -os 300 -f 1200 -o predictor_cas_20_dp_1_os_300
+python3 ${ml_morph_folder}/shape_trainer.py -d train.xml -t test.xml -th 12 -dp 1 -c 25  -nu 0.1 -os 300 -f 1200 -o predictor_cas_25_dp_1_os_300
+python3 ${ml_morph_folder}/shape_trainer.py -d train.xml -t test.xml -th 12 -dp 1 -c 30  -nu 0.1 -os 300 -f 1200 -o predictor_cas_30_dp_2_os_300
+python3 ${ml_morph_folder}/shape_trainer.py -d train.xml -t test.xml -th 12 -dp 2 -c 35  -nu 0.1 -os 300 -f 1200 -o predictor_cas_35_dp_2_os_300
+python3 ${ml_morph_folder}/shape_trainer.py -d train.xml -t test.xml -th 12 -dp 2 -c 30  -nu 0.1 -os 300 -f 1200 -o predictor_cas_30_dp_2_os_300
+```
+In the second part, you will compare shape prediction models using the script ```ML-Morph_compare_predictors.sh```
+```bash
+#PART 2
+echo "Starting part two: comparing shape prediction models"
+sbatch ML-Morph_compare_predictors.sh
+```
+Here you will see which model has the lower average pixel deviation, which is calculated based on the difference between the manually annotated and predicted landmarks. The best model can be used for following step
+#### c. Predicting landmarks in the test data
+For this we run the bash script ```ML-Morph_predict_on_test.sh```. In here, the line of code that is being run consist on running ```prediction.py``` which takes the input directory, the test images, with the argument ```-i```and the trained shape predictor model with the argument ```-p```. 
+```bash
+python3 ${ml_morph_folder}/prediction.py -i test -p ${working_folder}/predictor_cas_20_dp_1_os_300.dat
+```
+In this example, the best predictor model was the one with a cascade depth of 20 and three depth of 1. <ins>Please, change this according to the results you obtained in part b of this section.</ins> 
+This script will produce an ```output.tps``` file that you can visualize using *tpsDig*. 
+### 2. Predicting the landmarks position in a new set of data
+By now, you have a model that predicts landmarks well on the test data. If not, you will have to change parameters from section b of part 1 of this tutorial and repeat the process. When you are satisfied with this, you can come back here.\
+To predict the landmarks position in a new set of data you need to use a similar script as ```ML-Morph_predict_on_test.sh```. However, instead of using the test folder as the input data, you will use the images that have not been digitized yet. In this section, you are expected to write your own bash script to do this step. The script should be named ```ML-Morph_predict_on_new_images.sh```. Get inspiration from ```ML-Morph_predict_on_test.sh``` and other scripts used until here to write your own one!\
+Try submitting your script to the cluster and see the result. No worries if it doesn't run in the first time, we can go through it together but first try it on your own. 
+
+## Analyzing landmark data
+If you have reached this stage, congratulations!
 
