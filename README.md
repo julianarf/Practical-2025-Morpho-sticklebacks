@@ -273,7 +273,7 @@ no rescaling will be performed in these cases
 ```
 You will get an array of (30,2,n) dimensions, with n being the number of individuals in your TPS file. The number of columns, 30, refer to the number of landmarks, whereas the number of rows, 2, refers to the x and y coordinate of these landmarks. If you want to access the complete information of the first individual in the TPS file, you can do the following
 ```r
-> tps_one[,,1]
+> test_tps[,,1]
       [,1] [,2]
  [1,]  995 1401
  [2,] 1017 1438
@@ -306,6 +306,12 @@ You will get an array of (30,2,n) dimensions, with n being the number of individ
 [29,] 1605 1669
 [30,] 2988 1365
 ```
+To access more or different individuals you only have to change the third value when subsetting the array.
+If you would like to get the names associated to each landmark set and save them in a variable, do the following:
+```r
+names_training <- dimnames(test_tps)[[3]]
+```
+
 To measure the distances between landmarks use the function ```interlmkdist()``` as described in the example of the help section
 ```r
 data(plethodon)
