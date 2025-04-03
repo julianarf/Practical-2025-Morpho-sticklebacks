@@ -1,10 +1,10 @@
-# Mapping morphological traits to divergent chromosomal inversions in threespine sticklebacks
+# Mapping morphological traits to divergent chromosomal inversions in threespine sticklebacks 🐟
 
-Code for runing analyses for projects 4 and 5 of the practical of the division of Evolutionary Ecology held during the spring semester 2025
+Code for runing analyses for projects 4 and 5 of the practical of the division of Evolutionary Ecology held during the spring semester 2025 
 
 By now, you have collected the necessary data to start processing it. This means, that you have all the photographs and a subset of them have been annotated. If you are missing any of these steps, please finish those before following this. Here, you will learn how to execute the code from ML-morph to digitize landmarks automatically and some starting code to process the annotated data.
 
->*Before starting, please read the ML-morph [paper](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13373) and the [GitHub repository](https://github.com/agporto/ml-morph). I tried to make this comprehensible as posible but it doesn't include all the details mentioned there.*
+>*Before starting, please read the ML-morph [paper](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13373) and the [GitHub repository](https://github.com/agporto/ml-morph). I tried to make this comprehensible as posible but it doesn't include all the details mentioned there :shipit:*
 
 ## Using ML-morph to digitize landmarks automatically
 
@@ -237,5 +237,9 @@ To predict the landmarks position in a new set of data you need to use a similar
 Try submitting your script to the cluster and see the result. No worries if it doesn't run in the first time, we can go through it together but first try it on your own. 
 
 ## Analyzing landmark data
-If you have reached this stage, congratulations!
+If you have reached this stage, congratulations! :confetti_ball: :confetti_ball: :confetti_ball:	
+For the rest of this tutorial we are moving to R and you will need the following material:
+1. Inndividual data that includes genotype, sex and other variables depending on the project. You can find this on ILIAS.
+2. A TPS file that contains the predicted landmarks for all invididuals in your dataset.
+3. R. I personally like to run it on [RStudio](https://posit.co/download/rstudio-desktop/) but you can run it directly in R. Please try to annotate your code as thoroughly as possible, it can be a bit annoying sometimes but it is a great practice for what you might thank yourself in the future.
 
