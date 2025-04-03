@@ -262,6 +262,50 @@ readland.tps(
 ```
 If you have more than one TPS file to read you can use the function ```readmulti.tps()``` instead. In both scenarios, it is important that you specify ```specID = "imageID"```. The reason behind this, is that your file names are your IDs, so like this we can match a fish ID with a set of landmarks.
 
+Here you are reading the file *test.tps*. It is normal that you get this warning message. 
+```r
+test_tps <- readland.tps("test.tps", specID = "imageID")
+
+No curves detected; all points appear to be fixed landmarks.
+Warning in .readland.tps(file, specID, negNA, readcurves, warnmsg) :
+  Not all specimens have scale adjustment (perhaps because they are already scaled); 
+no rescaling will be performed in these cases
+```
+You will get an array of (30,2,n) dimensions, with n being the number of individuals in your TPS file. The number of columns, 30, refer to the number of landmarks, whereas the number of rows, 2, refers to the x and y coordinate of these landmarks. If you want to access the complete information of the first individual in the TPS file, you can do the following
+```r
+> tps_one[,,1]
+      [,1] [,2]
+ [1,]  995 1401
+ [2,] 1017 1438
+ [3,] 1036 1448
+ [4,] 1256 1563
+ [5,] 1149 1469
+ [6,] 1331 1465
+ [7,] 1247 1373
+ [8,] 1515 1651
+ [9,] 1807 1708
+[10,] 1892 1848
+[11,] 2070 1713
+[12,] 2209 1832
+[13,] 2431 1656
+[14,] 2986 1439
+[15,] 3191 1391
+[16,] 3186 1298
+[17,] 3304 1345
+[18,] 2992 1283
+[19,] 2637 1188
+[20,] 2332 1129
+[21,] 2008 1141
+[22,] 1827 1162
+[23,] 1438 1212
+[24,] 1121 1278
+[25,] 1141 1302
+[26,] 1113 1338
+[27,] 1437 1258
+[28,] 1602 1559
+[29,] 1605 1669
+[30,] 2988 1365
+```
 To measure the distances between landmarks use the function ```interlmkdist()``` as described in the example of the help section
 ```r
 data(plethodon)
