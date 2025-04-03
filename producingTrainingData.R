@@ -5,7 +5,7 @@ setwd("C://Users//julia//OneDrive - Universitaet Bern//PhD//Teaching/Practical C
 files <-list.files("C://Users//julia//OneDrive - Universitaet Bern//PhD//Teaching/Practical Course 2025/allPhotographs/") 
 
 #Get a sample of size n from the images you have in the folder. For example here you are getting a sample of size 100
-images_to_annotate <- sample(files, 100)
+sample_images <- sample(files, 100)
 
 #main directory is the folder where all of the pictures are
 main_directory <- "C://Users//julia//OneDrive - Universitaet Bern//PhD//Teaching/Practical Course 2025/allPhotographs"
@@ -13,7 +13,7 @@ main_directory <- "C://Users//julia//OneDrive - Universitaet Bern//PhD//Teaching
 training_directory <- "C://Users//julia//OneDrive - Universitaet Bern//PhD//Teaching/Practical Course 2025/training_directory"
 
 #For-loop to copy the images from the main folder to the training folder
-for(i in 1:100){
+for(i in 1:length(sample_images){
   file.copy(from = paste(main_directory,images_to_annotate[i],sep="/"),
             to = paste(training_directory,images_to_annotate[i],sep="/"))
 }
