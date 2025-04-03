@@ -1,5 +1,6 @@
 #########
 #Here you need to set your working directory where you have the folder with the images
+#This folder should have images ONLY!
 setwd("C://Users//julia//OneDrive - Universitaet Bern//PhD//Teaching/Practical Course 2025")
 
 files <-list.files("C://Users//julia//OneDrive - Universitaet Bern//PhD//Teaching/Practical Course 2025/allPhotographs/") 
