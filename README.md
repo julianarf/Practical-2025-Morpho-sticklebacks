@@ -241,5 +241,62 @@ If you have reached this stage, congratulations! :confetti_ball: :confetti_ball:
 For the rest of this tutorial we are moving to R and you will need the following material:
 1. Inndividual data that includes genotype, sex and other variables depending on the project. You can find this on ILIAS.
 2. A TPS file that contains the predicted landmarks for all invididuals in your dataset.
-3. R. I personally like to run it on [RStudio](https://posit.co/download/rstudio-desktop/) but you can run it directly in R. Please try to annotate your code as thoroughly as possible, it can be a bit annoying sometimes but it is a great practice for what you might thank yourself in the future.
+3. R. I personally like to run it on [RStudio](https://posit.co/download/rstudio-desktop/) but you can run it directly in R.
+
+For the following parts, there is no set code already written. In this tutorial you will learn about a couple of commands that will be particularly useful to analyze your data but it is your turn to write the code. Please try to annotate your code as thoroughly as possible, it can be a bit annoying sometimes but it is a great practice for what you might thank yourself in the future.
+
+### Handling TPS files
+To handle TPS file easily you can use the package ```geomorph``` which you can install with:
+```r
+install.packages("geomorph")
+```
+To read landmark data from TPS file use the function ```readland.tps()```
+```r
+readland.tps(
+  file,
+  specID = c("None", "ID", "imageID"),
+  negNA = FALSE,
+  readcurves = FALSE,
+  warnmsg = TRUE
+)
+```
+If you have more than one TPS file to read you can use the function ```readmulti.tps()``` instead. In both scenarios, it is important that you specify ```specID = "imageID"```. The reason behind this, is that your file names are your IDs, so like this we can match a fish ID with a set of landmarks.
+
+To measure the distances between landmarks use the function ```interlmkdist()``` as described in the example of the help section
+```r
+data(plethodon)
+# Make a matrix defining three interlandmark distances 
+lmks <- matrix(c(8,9,6,12,4,2), ncol=2, byrow=TRUE, 
+dimnames = list(c("eyeW", "headL", "mouthL"),c("start", "end")))
+
+# where 8-9 is eye width; 6-12 is head length; 4-2 is mouth length
+# or alternatively
+
+lmks <- data.frame(eyeW = c(8,9), headL = c(6,12), mouthL = c(4,2), 
+row.names = c("start", "end")) 
+
+A <- plethodon$land
+lineardists <- interlmkdist(A, lmks)
+```
+In your case, the matrix you have to create should represent the 18 interlandmark distances described here.
+| Trait ID | Trait name                     | LM1 | LM2 | Function              |
+|----------|--------------------------------|-----|-----|-----------------------|
+| 1        | Standard length               | 1   | 16  | Size                  |
+| 2        | Mouth length                  | 2   | 26  | Feeding               |
+| 3        | Jaw length                    | 1   | 24  | Feeding               |
+| 4        | Snout length                  | 1   | 5   | Feeding               |
+| 5        | Epaxial muscle height         | 28  | 29  | Feeding, Swimming     |
+| 6        | Head length upper             | 1   | 8   | Feeding               |
+| 7        | Buccal length                 | 23  | 24  | Feeding               |
+| 8        | Eye diameter (horizontal)     | 5   | 6   | Vision                |
+| 9        | Eye diameter (vertical)       | 4   | 7   | Vision                |
+| 10       | Pelvic spine length           | 20  | 21  | Defense               |
+| 11       | Dorsal spine length first     | 9   | 10  | Defense               |
+| 12       | Dorsal spine length second    | 11  | 12  | Defense               |
+| 13       | Dorsal fin length             | 13  | 14  | Swimming              |
+| 14       | Peduncle length upper         | 14  | 15  | Swimming              |
+| 15       | Peduncle length lower         | 17  | 18  | Swimming              |
+| 16       | Anal fin length               | 18  | 19  | Swimming              |
+| 17       | Anterior body depth           | 8   | 23  | Swimming              |
+| 18       | Posterior body depth          | 9   | 22  | Swimming              |
 
